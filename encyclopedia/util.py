@@ -36,10 +36,17 @@ def get_entry(title):
     except FileNotFoundError:
         return None
 
-def get_substrings(query):
+def get_substrings(title):
     """
-    Retrieves a list of substrings related to the entry (i.e. for python, returns py in list)
+    Retrieves a list of substrings related to the entry (i.e. for py, returns python)
     """
+    l = []
+
     entries = list_entries()
     for entry in entries:
+        if re.findall(rf"{title}",entry,flags=re.I):
+            l.append(entry)
+
+    return l
+
 
