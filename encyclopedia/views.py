@@ -76,8 +76,8 @@ def random_page(request):
 		"entry":random.choice(util.list_entries())
 		})
 
-def add_entry():
-    return render("encyclopedia/create_page.html")
+def create_page():
+    return redirect("encyclopedia/create_page.html")
 
 
 
