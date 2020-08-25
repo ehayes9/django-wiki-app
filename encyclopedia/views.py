@@ -12,7 +12,8 @@ class QueryForm(forms.Form):
 
 # create form class for new pages
 class NewPageForm(forms.Form):
-	page=forms.CharField(label='Page Title')
+	title=forms.CharField(label='Page Title')
+	content=forms.CharField(label='Markdown Content')
 
 # instantiate markdown
 
@@ -71,18 +72,22 @@ def return_results(request,title):
 
 # render random page from list of entries
 def random_page(request):
-	# entry = random.choice(util.list_entries())
-	return redirect("encyclopedia/results.html", {
-		"entry":random.choice(util.list_entries())
-		})
+	title = random.choice(util.list_entries())
+	entry = util.get_entry(title)
 
-def create_page():
-    return redirect("encyclopedia/create_page.html")
+	if entry is None:
+		return render(request, "encyclopedia/error.html", {
+            "form":QueryForm()
+            })
+	
+	else:
+		return render(request, "encyclopedia/results.html", {
+			"entry": markdown.convert(entry), 
+			"form":QueryForm()
+			})	
 
-
-
-def save_entry(request):
-
+def create_page(request):
+    
     # determine whether method = post
     if request.method=='POST':
 
@@ -91,21 +96,22 @@ def save_entry(request):
         # check whether form is valid
         if form.is_valid():
         	# assign query to variable
-            page=form.cleaned_data["page"]
-
+            title=form.cleaned_data["title"]
+            content=form.cleaned_data['content']
             # if page already exists, render error page
-            if util.get_entry(page):
-            	return render('encyclopedia/error.html')
+            if util.get_entry(title):
+            	return render(request,'encyclopedia/error.html')
 
-            # TODO: if page doesn't exist, save and create new
+            # if page doesn't exist, save and create new
             else:
-            	return render(request, "encyclopedia/error.html", {
-    				"title": page,
-    				# "content": 
-    				})
-                
+            	util.save_entry(title,content)
+            	return render(request, "encyclopedia/new_page.html", {
+            		"title":title,
+            		"content":content
+            		})
 
     return render(request, "encyclopedia/create_page.html", {
-        "entries": util.list_entries(),
-        "form":QueryForm()
-    })
+    	"form": NewPageForm()
+    	})
+
+

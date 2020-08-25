@@ -1,29 +1,40 @@
 {% extends "encyclopedia/layout.html" %}
 
 {% block title %}
-    Create Page
+    
+Create Page
+
 {% endblock %}
+
 
 {% block body %}
 
 <!-- todo: insert form & text box here
 pass form entry to render function -->
 
-<form action = "{% url 'encyclopedia:save_entry' %}" method ="POST">
+<form action="{% url 'encyclopedia:create_page' %}" method="POST">
 
 	{% csrf_token %}
-	{{ form }}
 
-        <input class="search" type="submit" name="q" placeholder="Enter page title" >
-
-
-<textarea id="markdown" name="entry_markdown" rows="4" cols="50">
-Enter markdown for new page here
-</textarea>
-
+	<div class="form-group">
+          <label>
+          	New Page Title
+          </label>
+          		<input type="text" class="form-control" placeholder="Title of the page..." name="title" required>
+    </div>
+    <div class="form-group">
+          <label>
+          	Enter Markdown Content for the New Page:
+          </label>
+          		<textarea class="form-control" rows="10" name="content" required></textarea>
+    </div>
+        <button type="submit" class="btn btn-primary">Submit</button>
 </form>
 
 {% endblock %}
+
+
+
 
 
 	
