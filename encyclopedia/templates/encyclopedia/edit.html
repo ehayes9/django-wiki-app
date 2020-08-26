@@ -1,0 +1,37 @@
+{% extends "encyclopedia/layout.html" %}
+
+{% block title %}
+    
+Edit Page
+
+{% endblock %}
+
+
+{% block body %}
+
+<!-- todo: insert form & text box here
+pass form entry to render function -->
+
+<form action="{% url 'encyclopedia:edit' title=title %}" method="POST">
+
+	{% csrf_token %}
+
+    <h1>
+
+      {{ title }}
+    
+    </h1>
+
+    <div class="form-group">
+
+          <label>
+          	Update Markdown Content for Existing Page:
+          </label>
+          		<textarea class="form-control" rows="10" name="content" required> 
+              {{content}}
+              </textarea>
+    </div>
+        <button type="submit" class="btn btn-primary">Submit</button>
+</form>
+
+{% endblock %}

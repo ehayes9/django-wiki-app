@@ -15,6 +15,10 @@ class NewPageForm(forms.Form):
 	title=forms.CharField(label='Page Title')
 	content=forms.CharField(label='Markdown Content')
 
+# create form class for editing entry
+class EditForm(forms.Form):
+	content=forms.CharField(label='Markdown Content')	
+
 # instantiate markdown
 
 markdown = Markdown()
@@ -36,18 +40,18 @@ def index(request):
             	return redirect('encyclopedia:return_results', query)
 
             # if query is in list of substrings render index page with related results
-            elif util.get_substrings(query) != None:
+            elif util.get_substrings(query) == []:
+            	return render(request, "encyclopedia/error.html", {
+    				"entries": util.list_entries()
+    				})
+
+            # return error page if query not in list of entries or substrings
+            else:
             	return render(request, "encyclopedia/index.html", {
     				"entries": util.get_substrings(query),
     				"form":QueryForm()
     				})
-            # return error page if query not in list of entries or substrings
-            else:
-            	return render(request, "encyclopedia/error.html", {
-    				"entries": util.list_entries()
-    				})
                 
-
     return render(request, "encyclopedia/index.html", {
         "entries": util.list_entries(),
         "form":QueryForm()
@@ -83,6 +87,7 @@ def random_page(request):
 	else:
 		return render(request, "encyclopedia/results.html", {
 			"entry": markdown.convert(entry), 
+			"title":title,
 			"form":QueryForm()
 			})	
 
@@ -100,7 +105,7 @@ def create_page(request):
             content=form.cleaned_data['content']
             # if page already exists, render error page
             if util.get_entry(title):
-            	return render(request,'encyclopedia/error.html')
+            	return render(request,'encyclopedia/pageexists.html')
 
             # if page doesn't exist, save and create new
             else:
@@ -114,4 +119,28 @@ def create_page(request):
     	"form": NewPageForm()
     	})
 
+def edit(request,title):
+	# todo: render edit.html page with form that displays markdown, allows you to save and overwrite
+    # determine whether method = post
+    if request.method=='POST':
+
+    	# take in query entered by user
+        form=EditForm(request.POST)
+
+        # check whether form is valid
+        if form.is_valid():
+            # title = form.cleaned_data["title"]
+            content=form.cleaned_data["content"]
+            util.save_entry(title,content)
+
+            return redirect("encyclopedia:return_results", title)
+        else:
+        	return render(request,'encyclopedia/error.html')
+
+    return render(request, "encyclopedia/edit.html", {
+    	"form":QueryForm(),
+    	"editform": EditForm(),
+    	"title":title,
+    	"content":util.get_entry(title)
+    	})
 

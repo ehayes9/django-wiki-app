@@ -9,12 +9,10 @@
 {% block body %}
 
     <h1>
-    	{{ entry | safe }}
+    	Error: {{ title}} page already exists
     
     </h1>
 
-   
-    <a href="{% url 'encyclopedia:edit' title %}">Edit Entry</a>
 
 
 {% endblock %}
